@@ -17,7 +17,7 @@ def delete_provider(db: Session, provider_id: str) -> bool:
     return True
 
 
-def update_provider(db: Session, provider_id: str, provider: schemas.ProviderBase):
+def update_provider(db: Session, provider_id: str, provider: schemas.Provider):
     db_provider = get_provider(db, provider_id)
     db_provider.id = provider.id
     db_provider.name = provider.name
@@ -25,10 +25,18 @@ def update_provider(db: Session, provider_id: str, provider: schemas.ProviderBas
     db_provider.created_at = provider.created_at
     db_provider.amount_products = provider.amount_products
     db.commit()
+    db.refresh(db_provider)
+    return db_provider
 
 
-def create_provider(db: Session, provider: schemas.ProviderBase):
-    db_provider = models.Provider(**provider)
+def create_provider(db: Session, provider: schemas.Provider):
+    db_provider = models.Provider(
+        id=provider.id,
+        name=provider.name,
+        company=provider.company,
+        created_at=provider.created_at,
+        amount_products=provider.amount_products
+    )
     db.add(db_provider)
     db.commit()
     db.refresh(db_provider)
