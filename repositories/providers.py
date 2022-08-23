@@ -8,10 +8,13 @@ def get_provider(db: Session, provider_id: str):
     return db.query(models.Provider).filter(models.Provider.id == provider_id).first()
 
 
-def delete_provider(db: Session, provider_id: str):
+def delete_provider(db: Session, provider_id: str) -> bool:
     db_provider = get_provider(db, provider_id)
+    if db_provider is None:
+        return False
     db.delete(db_provider)
     db.commit()
+    return True
 
 
 def update_provider(db: Session, provider_id: str, provider: schemas.ProviderBase):
@@ -29,3 +32,4 @@ def create_provider(db: Session, provider: schemas.ProviderBase):
     db.add(db_provider)
     db.commit()
     db.refresh(db_provider)
+    return db_provider
