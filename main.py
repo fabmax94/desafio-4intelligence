@@ -21,12 +21,18 @@ def get_db():
 
 @app.post("/providers/", response_model=schemas.provider.Provider)
 def create_provider_api(provider: schemas.provider.Provider, db: Session = Depends(get_db)):
-    return create_provider(db=db, provider=provider)
+    db_provider = create_provider(db=db, provider=provider)
+    if db_provider is None:
+        raise HTTPException(status_code=404, detail="This Provider already exist")
+    return db_provider
 
 
 @app.put("/providers/{provider_id}", response_model=schemas.provider.Provider)
 def update_provider_api(provider_id: str, provider: schemas.provider.Provider, db: Session = Depends(get_db)):
-    return update_provider(db=db, provider_id=provider_id, provider=provider)
+    db_provider = update_provider(db=db, provider_id=provider_id, provider=provider)
+    if db_provider is None:
+        raise HTTPException(status_code=404, detail="Provider is not found")
+    return db_provider
 
 
 @app.get("/providers/{provider_id}", response_model=schemas.provider.Provider)
